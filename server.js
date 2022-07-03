@@ -14,15 +14,16 @@ dotenv.config();
 
 const PORT = process.env.PORT
 
-
+//HANDLES SIGNUP AND LOGIN
 app.post('/signup', SignUp)
 app.post('/login', LogIn)
 
 // HANDLES CREDIT AND DEBIT
 app.post('/credit', Credit)
-
 app.post('/debit', Debit)
 
+//HANDLES BALANCE DISPLAY
+// app.get('/balance')
 
 
 app.listen(PORT, () => {
