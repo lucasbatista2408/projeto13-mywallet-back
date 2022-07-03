@@ -10,16 +10,20 @@ app.use(express.json());
 
 export async function Debit(req, res){
     const data = req.body;
+
     const { authorization } = req.headers;
     const token = authorization?.replace('Bearer ', '')
+    console.log(token)
 
-    if(!token) return res.sendStatus(401);
+    if(!token) {return res.sendStatus(401)};
 
-    const session = await db.collections("sessions").findOne({ token });
+    const session = await db.collection("sessions").findOne({token: token})
             
-    if (!session) return res.sendStatus(401);
+    if (!session) {
+        return res.sendStatus(401)
+    };
 
-	const user = await db.collections("users").findOne({_id: session.userId})
+	const user = await db.collection("users").findOne({_id: session.userId})
 
     const moveSchema = joi.object({
         amount: joi.string().min(1).required(),
@@ -28,16 +32,19 @@ export async function Debit(req, res){
 
     const {error} = moveSchema.validate(data, {abortEarly: false})
 
-    if(error) return res.status(422).send(error)
+    if(error) {return res.status(422).send(error)}
 
     const newAmount = parseFloat(data.amount.replace(',', '.')).toFixed(2)
     const debit = {
-        amount: newAmount,
+        user: user._id,
+        amount: -(newAmount),
         description: data.description,
         type: 'debit',
         date: dayjs().format('DD/MM'),
         hour:dayjs().format('HH:mm')
     }
+
+    if(!user) return res.status(401)
 
     try{
         await db.collection('balance').insertOne(debit)
@@ -50,6 +57,23 @@ export async function Debit(req, res){
 
 export async function Credit (req, res){
     const data = req.body;
+
+    const { authorization } = req.headers;
+    const token = authorization?.replace('Bearer ', '')
+    console.log(token)
+
+    if(!token) {return res.sendStatus(401)};
+
+    const session = await db.collection("sessions").findOne({token: token})
+            
+    if (!session) {
+        return res.sendStatus(401)
+    };
+
+	const user = await db.collection("users").findOne({_id: session.userId})
+
+    if(!user) return res.status(401)
+
     const newAmount = parseFloat(data.amount.replace(',', '.')).toFixed(2)
 
     const moveSchema = joi.object({
@@ -64,12 +88,14 @@ export async function Credit (req, res){
     }
 
     const credit = {
+        user: user._id,
         amount: newAmount,
         description: data.description,
         type: 'credit',
         date: dayjs().format('DD/MM'),
         hour: dayjs().format('HH:mm')
     }
+
     try{
         await db.collection('balance').insertOne(credit)
         res.sendStatus(201)
@@ -80,5 +106,27 @@ export async function Credit (req, res){
 }
 
 export async function Balance(req, res){
+    const { authorization } = req.headers;
+    const token = authorization?.replace('Bearer ', '')
+    console.log(token)
 
+    if(!token) {return res.status(401).send('erro no token')};
+
+    const session = await db.collection("sessions").findOne({token: token})
+            
+    if (!session) {
+        return res.status(400).send('sessão não encontrada')
+    };
+
+	const user = await db.collection("users").findOne({_id: session.userId})
+
+    if(!user) return res.status(401)
+
+    try{
+        const balance = await db.collection('balance').find({user: user._id}).toArray()
+        res.status(201).send(balance)
+    } catch(err){
+        console.log(err)
+        return res.send(err)
+    }
 }

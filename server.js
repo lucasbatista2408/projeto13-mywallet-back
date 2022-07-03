@@ -3,7 +3,7 @@ import cors from "cors"
 import chalk from "chalk"
 import dotenv from "dotenv"
 import {LogIn, SignUp} from "./controllers/userController.js"
-import {Debit, Credit} from "./controllers/movementController.js"
+import {Debit, Credit, Balance} from "./controllers/movementController.js"
 
 const app = express();
 
@@ -23,7 +23,7 @@ app.post('/credit', Credit)
 app.post('/debit', Debit)
 
 //HANDLES BALANCE DISPLAY
-// app.get('/balance')
+app.get('/balance', Balance)
 
 
 app.listen(PORT, () => {

@@ -8,7 +8,7 @@ const app = express();
 
 app.use(express.json());
 
-export async function LogIn(req, res){
+export async function LogIn(req, res){db;
     const user = await req.body;
     console.log(user)
 
