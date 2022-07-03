@@ -37,7 +37,7 @@ app.get('/signUp', async (req, res) => {
 app.post('/logIn', async (req, res) => {
     const user = req.body;
     console.log(user)
-    const found = await db.collection('users').findOne({user: user.user, password: user.password})
+    const found = await db.collection('users').findOne({name: user.user, password: user.password})
     console.log(found)
 
     if(!found){
@@ -45,6 +45,41 @@ app.post('/logIn', async (req, res) => {
     } else{
         return res.sendStatus(200)
     }
+})
+
+// HANDLES CREDIT AND DEBIT
+app.post('/credit', async (req, res) => {
+    const data = req.body;
+    const credit = {
+        amount: data.amount,
+        description: data.description,
+        type: 'credit'
+    }
+    try{
+        await db.collection('credit').inserOne(credit)
+        res.sendStatus(201)
+    } catch(err){
+        console.log(err)
+        res.sendStatus(500)
+    }
+    
+})
+
+app.post('/debit', async (req, res) => {
+    const data = req.body;
+    const debit = {
+        amount: - data.amount,
+        description: data.description,
+        type: 'debit'
+    }
+    try{
+        await db.collection('debit').inserOne(debit)
+        res.sendStatus(201)
+    } catch(err){
+        console.log(err)
+        res.sendStatus(500)
+    }
+    
 })
 
 
