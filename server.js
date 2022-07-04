@@ -2,11 +2,10 @@ import express from "express"
 import cors from "cors"
 import chalk from "chalk"
 import dotenv from "dotenv"
-import {LogIn, SignUp} from "./controllers/userController.js"
-import {Debit, Credit, Balance} from "./controllers/movementController.js"
+import userRouter from './router/userRoute.js';
+import moveRouter from './router/moveRoute.js'
 
 const app = express();
-
 
 app.use(cors());
 app.use(express.json());
@@ -15,15 +14,10 @@ dotenv.config();
 const PORT = process.env.PORT
 
 //HANDLES SIGNUP AND LOGIN
-app.post('/signup', SignUp)
-app.post('/login', LogIn)
+app.use(userRouter)
 
-// HANDLES CREDIT AND DEBIT
-app.post('/credit', Credit)
-app.post('/debit', Debit)
-
-//HANDLES BALANCE DISPLAY
-app.get('/balance', Balance)
+// HANDLES CREDIT DEBIT AND BALANCE DISPLAY
+app.use(moveRouter)
 
 
 app.listen(PORT, () => {
