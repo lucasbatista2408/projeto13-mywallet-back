@@ -4,7 +4,7 @@ import dotenv from "dotenv"
 
 dotenv.config();
 
-const url = process.env.URL_DB_CONNECT;
+const url = process.env.MONGO_URI;
 const client = new MongoClient(url);
 let db;
 
