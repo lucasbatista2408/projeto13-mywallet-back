@@ -27,5 +27,5 @@ app.get('/balance', Balance)
 
 
 app.listen(PORT, () => {
-    console.log(chalk.bold.blue('SERVER_UP'));
+    console.log(chalk.bold.blue('SERVER_UP ON PORT' + PORT));
   });

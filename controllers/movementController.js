@@ -37,7 +37,7 @@ export async function Debit(req, res){
     const newAmount = parseFloat(data.amount.replace(',', '.')).toFixed(2)
     const debit = {
         user: user._id,
-        amount: -(newAmount),
+        amount: newAmount,
         description: data.description,
         type: 'debit',
         date: dayjs().format('DD/MM'),
@@ -48,7 +48,7 @@ export async function Debit(req, res){
 
     try{
         await db.collection('balance').insertOne(debit)
-        res.status(201).send('inserted')
+        res.status(201).send(debit)
     } catch(err){
         console.log(err)
         res.sendStatus(500)

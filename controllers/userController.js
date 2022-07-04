@@ -23,6 +23,9 @@ export async function LogIn(req, res){db;
       return res.status(422).send(error);
   } else{
     const found = await db.collection('users').findOne({email: user.email})
+
+    if(!found) {return res.status(404)}
+
     const comparePass = bcrypt.compareSync(user.password, found.password)
 
       if(found && comparePass){
@@ -33,7 +36,12 @@ export async function LogIn(req, res){db;
 					userId: found._id,
 					token
 				})
-        return res.status(200).send(token)
+        
+        const send = {
+          user: found.name,
+          token: token
+        }
+        return res.status(200).send(send)
       } else{
         return res.status(404).send("User and/or password does not match")
       }
@@ -55,6 +63,12 @@ export async function SignUp(req, res){
 
   if (error) {
       return res.status(422).send(error);
+  }
+
+  const exists = await db.collection('users').findOne({email})
+
+  if(exists){
+    return res.status(409).send('email already exists')
   }
 
   const encrypted = bcrypt.hashSync(password, 10);
